@@ -1,0 +1,127 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title></title></head>
+<style>canvas{ display:block; } body, html { padding:0px; margin:0px; width:100%; height:100%; }</style>
+<body><script src="../../import-map.js"></script><script type="module"></script><script type="module">
+
+// #region IMPORTS
+import useThreeWebGL2, { THREE, useDarkScene, useVisualDebug } from '../src/lib/useThreeWebGL2.js';
+import BoxBorderMaterial from '../src/lib/material/BoxBorderMaterial.js';
+// #endregion
+
+// #region MAIN
+let App   = useDarkScene( useThreeWebGL2() );
+let Ref   = {
+    geo: new THREE.BoxGeometry( 1, 1, 1 ),
+};
+let Debug;
+
+window.addEventListener( 'load', async _=>{
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Setup
+    App.sphericalLook( 0, 20, 20 );
+    Debug = await useVisualDebug( App );
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    makeBlock( TETRIMINO.L, [0,0,0] );
+    makeBlock( TETRIMINO.J, [4,0,0] );
+    makeBlock( TETRIMINO.Z, [4,3,0] );
+    makeBlock( TETRIMINO.S, [0,3,0] );
+    makeBlock( TETRIMINO.I, [-3,0,0] );
+    makeBlock( TETRIMINO.T, [-2,6,0] );
+    makeBlock( TETRIMINO.O, [2,6,0] );
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    App.renderLoop();
+});
+// #endregion
+
+function makeBlock( o, offset=[0,0,0] ){
+    const mat = BoxBorderMaterial( { faceColor: o.color } );
+    let mesh;
+
+    for( let c of o.blocks ){
+        mesh = new THREE.Mesh( Ref.geo, mat );
+        mesh.position.set( c[0] + offset[0], c[1] + offset[1], c[2] + offset[2] );
+        App.scene.add( mesh );
+    }
+}
+
+const TETRIMINO = {
+    L:{
+        name    : 'Orange Ricky',
+        color   : 0xF2C293,
+        blocks  : [
+            [-1,0,0],
+            [0,0,0],
+            [1,0,0],
+            [1,1,0],
+        ],
+    },
+
+    J:{
+        name    : 'Blue Ricky',
+        color   : 0x80D2F6,
+        blocks  : [
+            [-1,1,0],
+            [-1,0,0],
+            [0,0,0],
+            [1,0,0],
+        ],
+    },
+
+    Z:{
+        name    : 'Cleveland',
+        color   : 0xF5A5A5,
+        blocks  : [
+            [-1,1,0],
+            [0,0,0],
+            [0,1,0],
+            [1,0,0],
+        ],
+    },
+
+    S:{
+        name    : 'Rhode Island',
+        color   : 0x00ff00,
+        blocks  : [
+            [-1,0,0],
+            [0,0,0],
+            [0,1,0],
+            [1,1,0],
+        ],
+    },
+
+    I:{
+        name    : 'Hero',
+        color   : 0x00ffff,
+        blocks  : [
+            [0,0,0],
+            [0,1,0],
+            [0,2,0],
+            [0,3,0],
+        ],
+    },
+
+    T:{
+        name    : 'Teewee',
+        color   : 0xE2CBFF,
+        blocks  : [
+            [-1,0,0],
+            [0,0,0],
+            [0,1,0],
+            [1,0,0],
+        ],
+    },
+
+    O:{
+        name    : 'Smashboy',
+        color   : 0xffff00,
+        blocks  : [
+            [-1,0,0],
+            [-1,1,0],
+            [0,0,0],
+            [0,1,0],
+        ],
+    },
+};
+</script></body></html>
