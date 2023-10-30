@@ -4,13 +4,15 @@
 
 // #region IMPORTS
 import useThreeWebGL2, { THREE, useDarkScene, useVisualDebug } from '../src/lib/useThreeWebGL2.js';
-import BoxBorderMaterial from '../src/lib/material/BoxBorderMaterial.js';
+import BoxBorderMaterial    from '../src/lib/material/BoxBorderMaterial_v2.js';
+import Cube                 from '../src/lib/meshes/Cube.js';
 // #endregion
 
 // #region MAIN
 let App   = useDarkScene( useThreeWebGL2() );
 let Ref   = {
-    geo: new THREE.BoxGeometry( 1, 1, 1 ),
+    // geo: new THREE.BoxGeometry( 1, 1, 1 ),
+    geo: Cube.mesh( {offset:[0,0,0]} ),
 };
 let Debug;
 
@@ -20,7 +22,14 @@ window.addEventListener( 'load', async _=>{
     App.sphericalLook( 0, 20, 20 );
     Debug = await useVisualDebug( App );
 
+    console.log( Ref.geo );
+
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    // let mesh = new THREE.Mesh( Ref.geo, BoxBorderMaterial(  ) );
+    // mesh.scale.x = 2;
+    // mesh.scale.y = 3;
+    // App.scene.add( mesh );
 
     makeBlock( TETRIMINO.L, [0,0,0] );
     makeBlock( TETRIMINO.J, [4,0,0] );

@@ -42,14 +42,14 @@ export default function BoxBorderMaterial( props={} ){
 
         flat out vec3 fragMaxLPos;
         flat out vec3 fragLNorm;
-            out vec3 fragScaleLPos;
+             out vec3 fragScaleLPos;
 
         vec3 decomposeScaleFromMat4( mat4 m ){
-        return vec3(
-            length( vec3( m[0][0], m[0][1], m[0][2] ) ),
-            length( vec3( m[1][0], m[1][1], m[1][2] ) ),
-            length( vec3( m[2][0], m[2][1], m[2][2] ) )
-        );
+            return vec3(
+                length( vec3( m[0][0], m[0][1], m[0][2] ) ),
+                length( vec3( m[1][0], m[1][1], m[1][2] ) ),
+                length( vec3( m[2][0], m[2][1], m[2][2] ) )
+            );
         }
 
         void main(){
@@ -57,11 +57,18 @@ export default function BoxBorderMaterial( props={} ){
             vec4 vPos     = viewMatrix * wPos;                    // View Space
             gl_Position   = projectionMatrix * vPos;
 
+            /* ORIGIN AT CENTER
             // Scaled Localspace Position
             fragScaleLPos = position * decomposeScaleFromMat4( modelMatrix );
 
             // Non-Interpolated values
             fragMaxLPos   = abs( fragScaleLPos );
+            fragLNorm     = abs( normal );
+            */
+
+            /* ORGIN AT BOTTOM TOP CORNER */
+            fragMaxLPos   = decomposeScaleFromMat4( modelMatrix );
+            fragScaleLPos = position * fragMaxLPos;
             fragLNorm     = abs( normal );
         }`,
 
@@ -76,23 +83,37 @@ export default function BoxBorderMaterial( props={} ){
 
         flat in vec3 fragMaxLPos;
         flat in vec3 fragLNorm;
-            in vec3 fragScaleLPos;
+             in vec3 fragScaleLPos;
 
         out vec4 outColor;
 
         void main(){
-        vec3 absPos = abs( fragScaleLPos );  // Absolute Scaled Position to handle negative axes
-        vec3 px     = fwidth( absPos );      // Pixel Difference
+            /*
+            // USED FOR CUBES'S ORIGIN AT CENTER
+            vec3 absPos = abs( fragScaleLPos );  // Absolute Scaled Position to handle negative axes
+            vec3 px     = fwidth( absPos );      // Pixel Difference
 
-        // Use normal to filter out specific axis, ex: Front face, its normal is [0,0,1]
-        // We only need XY to draw border, so adding normal makes sure Z get a higher value by
-        // adding 1 to its results value while adding 0 to the others. Using the MIN function will
-        // end up selecting either X or Y since it'll have the smallest value & filter out Z.
+            // Use normal to filter out specific axis, ex: Front face, its normal is [0,0,1]
+            // We only need XY to draw border, so adding normal makes sure Z get a higher value by
+            // adding 1 to its results value while adding 0 to the others. Using the MIN function will
+            // end up selecting either X or Y since it'll have the smallest value & filter out Z.
 
-        vec3 vMask = fragLNorm + smoothstep( fragMaxLPos - borderSize, fragMaxLPos - borderSize - px, absPos );
-        float mask = 1.0 - min( min( vMask.x, vMask.y ), vMask.z );
+            vec3 vMask = fragLNorm + smoothstep( fragMaxLPos - borderSize, fragMaxLPos - borderSize - px, absPos );
+            float mask = 1.0 - min( min( vMask.x, vMask.y ), vMask.z );
 
-        outColor   = mix( vec4( faceColor, faceAlpha ), vec4( borderColor, borderAlpha ), mask );
+            outColor   = mix( vec4( faceColor, faceAlpha ), vec4( borderColor, borderAlpha ), mask );
+            */
+
+            // USED FOR CUBE"S ORIGIN AT BOTTOM LEFT CORNER
+            vec3 maxPos = fragMaxLPos * 0.5;                // MaxLPos is the actual scale value
+            vec3 absPos = abs( fragScaleLPos - maxPos );    // Halfing max, we can then get Pos from Center
+            vec3 px     = fwidth( absPos );
+
+            // The rest of the code follows the original
+            vec3 vMask  = fragLNorm + smoothstep( maxPos - borderSize, maxPos - borderSize - px, absPos );
+            float mask  = 1.0 - min( min( vMask.x, vMask.y ), vMask.z );
+
+            outColor    = mix( vec4( faceColor, faceAlpha ), vec4( borderColor, borderAlpha ), mask );
         }`,
     });
 
