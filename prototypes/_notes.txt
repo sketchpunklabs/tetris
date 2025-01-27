@@ -1,0 +1,37 @@
+https://github.com/RylanBot/threejs-tetris-react
+
+
+- Get Next Random Piece
+- Each tick
+-- Move mino down
+-- Test if can not longer move down
+---- If done, Check for tetris
+------- If so, remove all possible rows
+------- Update counter for successful ticks
+------- More Rows gives you better score
+------- Decrease tick duration
+
+Press down to end tick early
+
+On Rotate or Movement
+-- Test if new location is possible
+-- Show final placement possibility
+
+Use Instancing?
+-- At the end of every tick, Regenerate
+instance buffers with the results of the
+voxel grid.
+
+
+Game
+.tickDuration = 5
+.ticks = 0;
+.score = 0;
+.isPaused = false;
+
+.grid  = new VoxelGrid();
+.floor = new BoxGrid();
+
+.bag = new Random7();
+    .next()     -- Get Next Piece
+    .preview()  -- Preview next Piece
